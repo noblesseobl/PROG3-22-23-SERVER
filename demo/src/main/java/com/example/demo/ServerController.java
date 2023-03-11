@@ -42,9 +42,10 @@ public class ServerController implements Initializable {
 
 
                     String[] user = "tizio@gmail.com".split("@");
-                    ArrayList<Email> casella = leggiCasella(user[0]);
+                    List<Email> casella = new ArrayList<Email>();
+                    List<Email> newMail = FileQuery.readMailJSON();
+                    casella = newMail;
                     outStream.writeObject(casella);
-                    outStream.flush();
                 } finally {
                     socket.close();
                     outStream.close();
