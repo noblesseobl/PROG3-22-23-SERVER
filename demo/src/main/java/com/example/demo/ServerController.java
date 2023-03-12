@@ -43,7 +43,7 @@ public class ServerController implements Initializable {
 
                     String[] user = "tizio@gmail.com".split("@");
                     List<Email> casella = new ArrayList<Email>();
-                    List<Email> newMail = FileQuery.readMailJSON();
+                    List<Email> newMail = readMailJSON();
                     casella = newMail;
                     outStream.writeObject(casella);
                 } finally {
@@ -89,6 +89,44 @@ public class ServerController implements Initializable {
 
 
     }
+
+    public static List<Email> readMailJSON() throws IOException {
+
+        List<Email> newMailList = new ArrayList<>();
+        File file = new File("C:\\Users\\ilmit\\Desktop\\PROG3-22-23-SERVER\\demo\\src\\main\\java\\CASELLE\\tizio.json");
+
+
+        try {
+            if(file.length()!= 0) {
+
+                InputStream fis = new FileInputStream(file);//leggo il file
+                JsonReader jsonReader = Json.createReader(fis);
+                JsonArray jsonArray = jsonReader.readArray();//leggo l'array json
+
+                fis.close();//qui possiamo già chiudere la risorsa di lettura del file
+
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    JsonObject mail = jsonArray.getJsonObject(i);
+                    JsonArray destsArray = mail.getJsonArray("destinatari");
+                    List<String> destinatari = new ArrayList<>();
+                    for (JsonValue s : destsArray) {//scompongo l'array json di destinatari
+                        destinatari.add(s.toString());
+                    }
+                    //salvo tutto dentro Email e
+                    Email e = new Email(mail.getString("mittente"), destinatari, mail.getString("oggetto"), mail.getString("testo"), mail.getString("data"));
+                    e.setId(mail.getInt("id"));//setto l'id della mail
+                    newMailList.add(e);
+                    //e.printMailContent();
+                }
+                jsonReader.close();
+            }
+        } finally {
+
+        }
+
+        return newMailList;
+    }
+
 
     private void scriviCasella(String email, Email lettera){
 
